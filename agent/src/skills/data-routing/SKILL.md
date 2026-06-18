@@ -13,6 +13,7 @@ description: Data source selection decision tree. Load this skill BEFORE any bac
 | yfinance | US stocks, HK stocks, ETFs | No | Needs Yahoo Finance access | yfinance |
 | okx | Crypto (OKX exchange) | No | Needs okx.com access | okx-market |
 | ccxt | Crypto (100+ exchanges) | No | Needs exchange access | ccxt |
+| a_stock_data | A-shares (研报/新闻/公告/资金面/信号/基础数据) | Optional (iwencai only) | China network | a_stock_data |
 
 ## Decision Tree
 
@@ -28,6 +29,7 @@ You do NOT need to specify a concrete data source in config.json unless the user
 2. Pick the source by priority:
 
 **A-shares**: tushare (if TUSHARE_TOKEN is set) > akshare (free fallback)
+**A-shares (extended)**: a_stock_data (研报/新闻/公告/资金面/信号/基础数据 — use `get_a_stock_data` tool)
 **US stocks**: yfinance > akshare
 **HK stocks**: yfinance > akshare
 **Crypto**: okx (single exchange) > ccxt (multi-exchange)
@@ -41,6 +43,7 @@ You do NOT need to specify a concrete data source in config.json unless the user
 
 - **tushare**: check if `TUSHARE_TOKEN` environment variable exists
 - **yfinance / okx / ccxt / akshare**: free but may have network restrictions
+- **a_stock_data**: free for most endpoints; `IWENCAI_API_KEY` required only for iwencai NL/structured search
 - If the user reports "connection timeout" or "cannot access", switch to the same-market fallback
 
 ## Symbol Format Reference

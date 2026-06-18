@@ -3,6 +3,8 @@
     "version": "v0.1.9"
   },
   "layout": {
+    "overview": "概览",
+    "humanoidRobot": "人形机器人",
     "home": "首页",
     "agent": "智能体",
     "runtime": "运行时",
@@ -508,6 +510,14 @@
     "fullReport": "完整报告 →",
     "pineScript": "Pine Script",
     "shadowReport": "影子报告"
+  },
+  "overview": {
+    "title": "概览",
+    "placeholder": "即将推出 — 市场、持仓与关键指标仪表盘。"
+  },
+  "humanoidRobot": {
+    "title": "人形机器人",
+    "placeholder": "即将推出 — 人形机器人控制与监控。"
   },
   "home": {
     "title": "AI 驱动的量化策略研究",

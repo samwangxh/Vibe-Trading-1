@@ -3,6 +3,8 @@
     "version": "v0.1.9"
   },
   "layout": {
+    "overview": "Overview",
+    "humanoidRobot": "Humanoid Robot",
     "home": "Home",
     "agent": "Agent",
     "runtime": "Runtime",
@@ -508,6 +510,14 @@
     "fullReport": "Full Report →",
     "pineScript": "Pine Script",
     "shadowReport": "Shadow Report"
+  },
+  "overview": {
+    "title": "Overview",
+    "placeholder": "Coming soon — dashboard overview of markets, positions, and key metrics."
+  },
+  "humanoidRobot": {
+    "title": "Humanoid Robot",
+    "placeholder": "Coming soon — humanoid robot control and monitoring."
   },
   "home": {
     "title": "AI-Powered Quant Strategy Research",

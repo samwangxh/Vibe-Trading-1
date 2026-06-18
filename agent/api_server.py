@@ -588,7 +588,7 @@ async def _reject_untrusted_loopback_host(request: Request, call_next):
 # text/html`` (e.g. a user pasting the URL into the address bar).
 
 _FRONTEND_DIST = Path(__file__).resolve().parent.parent / "frontend" / "dist"
-_SPA_HTML_EXACT_PATHS: frozenset[str] = frozenset({"/correlation"})
+_SPA_HTML_EXACT_PATHS: frozenset[str] = frozenset({"/correlation", "/overview", "/humanoid-robot"})
 # Each regex matches a complete request path. Trailing slash optional.
 _SPA_HTML_PATH_REGEX: tuple[re.Pattern[str], ...] = (
     # ``/runs/{run_id}`` — RunDetail page. Excludes ``/runs/{id}/code``,
@@ -1684,6 +1684,101 @@ async def get_correlation_matrix(
         raise HTTPException(status_code=400, detail=str(exc))
     except Exception as exc:
         raise HTTPException(status_code=500, detail=f"Correlation computation failed: {exc}")
+
+
+@app.get("/market-indices")
+async def get_market_indices():
+    """Fetch real-time index levels and change percentages for major A-share and US indices.
+
+    Returns a list of index objects with name, code, price, change, and change_pct.
+    Data is sourced from Tencent Finance's real-time quote API.
+    """
+    from src.skills.a_stock_data.a_stock_data import tencent_quote
+
+    # A-share indices (Tencent codes: sh000001=上证, sz399001=深成指,
+    # sh000300=沪深300, sh000905=中证500, sz399006=创业板指)
+    # US indices (Tencent codes: .DJI=道琼斯, .IXIC=纳斯达克, .INX=标普500)
+    a_index_codes = ["sh000001", "sz399001", "sh000300", "sh000905", "sz399006"]
+    us_index_codes = [".DJI", ".IXIC", ".INX"]
+
+    results: list[dict[str, Any]] = []
+
+    # Fetch A-share indices
+    try:
+        a_quotes = tencent_quote(a_index_codes)
+        a_names = {
+            "000001": ("上证指数", "Shanghai Composite"),
+            "399001": ("深证成指", "Shenzhen Component"),
+            "000300": ("沪深300", "CSI 300"),
+            "000905": ("中证500", "CSI 500"),
+            "399006": ("创业板指", "ChiNext"),
+        }
+        for code6, q in a_quotes.items():
+            name_zh, name_en = a_names.get(code6, (code6, code6))
+            price = q.get("price", 0)
+            last_close = q.get("last_close", 0)
+            change = price - last_close if price and last_close else 0
+            change_pct = (change / last_close * 100) if last_close else 0
+            results.append({
+                "code": code6,
+                "name_zh": name_zh,
+                "name_en": name_en,
+                "market": "a_share",
+                "price": round(price, 2),
+                "change": round(change, 2),
+                "change_pct": round(change_pct, 2),
+            })
+    except Exception as exc:
+        logger.warning("Failed to fetch A-share indices: %s", exc)
+
+    # Fetch US indices
+    try:
+        us_url = "https://qt.gtimg.cn/q=" + ",".join(us_index_codes)
+        us_resp = urllib.parse.quote(us_index_codes[0], safe="")  # unused, just import
+        import requests as _req
+        resp = _req.get(
+            "https://qt.gtimg.cn/q=" + ",".join(us_index_codes),
+            headers={"User-Agent": "Mozilla/5.0"}, timeout=10,
+        )
+        resp.encoding = "gbk"
+        us_names = {
+            ".DJI": ("道琼斯", "Dow Jones"),
+            ".IXIC": ("纳斯达克", "NASDAQ"),
+            ".INX": ("标普500", "S&P 500"),
+        }
+        for segment in resp.text.split(";"):
+            segment = segment.strip()
+            if not segment or '="' not in segment:
+                continue
+            try:
+                var_part, value_part = segment.split("=", 1)
+                value_part = value_part.strip('"')
+                fields = value_part.split("~")
+                if len(fields) < 10:
+                    continue
+                code = var_part.split("_")[-1] if "_" in var_part else var_part
+                # e.g. v_.DJI → .DJI
+                raw_code = var_part.replace("v_", "")
+                name_zh, name_en = us_names.get(raw_code, (fields[1] if len(fields) > 1 else raw_code, raw_code))
+                price = float(fields[3]) if fields[3] else 0
+                last_close = float(fields[4]) if fields[4] else 0
+                change = price - last_close if price and last_close else 0
+                change_pct = (change / last_close * 100) if last_close else 0
+                results.append({
+                    "code": raw_code,
+                    "name_zh": name_zh,
+                    "name_en": name_en,
+                    "market": "us",
+                    "price": round(price, 2),
+                    "change": round(change, 2),
+                    "change_pct": round(change_pct, 2),
+                })
+            except (ValueError, IndexError):
+                continue
+    except Exception as exc:
+        logger.warning("Failed to fetch US indices: %s", exc)
+
+    return {"indices": results, "updated_at": datetime.now().isoformat()}
 
 
 def _terminate_current_process() -> None:

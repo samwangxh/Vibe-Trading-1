@@ -513,7 +513,10 @@
   },
   "overview": {
     "title": "概览",
-    "placeholder": "即将推出 — 市场、持仓与关键指标仪表盘。"
+    "placeholder": "即将推出 — 市场、持仓与关键指标仪表盘。",
+    "refresh": "刷新",
+    "noData": "暂无行情数据",
+    "noDataDesc": "无法加载市场指数数据，请尝试刷新。"
   },
   "humanoidRobot": {
     "title": "人形机器人",

@@ -513,7 +513,10 @@
   },
   "overview": {
     "title": "Overview",
-    "placeholder": "Coming soon — dashboard overview of markets, positions, and key metrics."
+    "placeholder": "Coming soon — dashboard overview of markets, positions, and key metrics.",
+    "refresh": "Refresh",
+    "noData": "No market data available",
+    "noDataDesc": "Market index data could not be loaded. Try refreshing."
   },
   "humanoidRobot": {
     "title": "Humanoid Robot",

@@ -516,7 +516,8 @@
     "placeholder": "即将推出 — 市场、持仓与关键指标仪表盘。",
     "refresh": "刷新",
     "noData": "暂无行情数据",
-    "noDataDesc": "无法加载市场指数数据，请尝试刷新。"
+    "noDataDesc": "无法加载市场指数数据，请尝试刷新。",
+    "dataUnavailable": "数据暂不可用 — 请检查服务器连接"
   },
   "humanoidRobot": {
     "title": "人形机器人",

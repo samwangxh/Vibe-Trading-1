@@ -1731,6 +1731,26 @@ async def get_market_indices():
     except Exception as exc:
         logger.warning("Failed to fetch A-share indices: %s", exc)
 
+    # If no A-share data came back, provide static fallback levels
+    if not any(r.get("market") == "a_share" for r in results):
+        a_fallback = [
+            ("000001", "上证指数", "Shanghai Composite"),
+            ("399001", "深证成指", "Shenzhen Component"),
+            ("000300", "沪深300", "CSI 300"),
+            ("000905", "中证500", "CSI 500"),
+            ("399006", "创业板指", "ChiNext"),
+        ]
+        for code, name_zh, name_en in a_fallback:
+            results.append({
+                "code": code,
+                "name_zh": name_zh,
+                "name_en": name_en,
+                "market": "a_share",
+                "price": 0,
+                "change": 0,
+                "change_pct": 0,
+            })
+
     # Fetch US indices
     try:
         us_url = "https://qt.gtimg.cn/q=" + ",".join(us_index_codes)
@@ -1777,6 +1797,24 @@ async def get_market_indices():
                 continue
     except Exception as exc:
         logger.warning("Failed to fetch US indices: %s", exc)
+
+    # If no US data came back, provide static fallback levels
+    if not any(r.get("market") == "us" for r in results):
+        us_fallback = [
+            (".DJI", "道琼斯", "Dow Jones"),
+            (".IXIC", "纳斯达克", "NASDAQ"),
+            (".INX", "标普500", "S&P 500"),
+        ]
+        for code, name_zh, name_en in us_fallback:
+            results.append({
+                "code": code,
+                "name_zh": name_zh,
+                "name_en": name_en,
+                "market": "us",
+                "price": 0,
+                "change": 0,
+                "change_pct": 0,
+            })
 
     return {"indices": results, "updated_at": datetime.now().isoformat()}
 

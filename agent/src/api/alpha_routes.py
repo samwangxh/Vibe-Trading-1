@@ -362,7 +362,7 @@ def register_alpha_routes(
     if require_auth is None or require_event_stream_auth is None:
         import sys as _sys
 
-        host = _sys.modules.get("api_server") or _sys.modules.get("agent.api_server")
+        host = _sys.modules.get("api_server") or _sys.modules.get("agent.api_server") or _sys.modules.get("__main__")
         if host is None:  # pragma: no cover — only triggers on weird import setups
             raise RuntimeError(
                 "register_alpha_routes: api_server module not in sys.modules; "

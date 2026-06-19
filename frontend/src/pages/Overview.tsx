@@ -88,14 +88,22 @@ function IndexCard({ index }: { index: IndexQuote }) {
       <div className="mt-3 flex items-end justify-between gap-2">
         <div>
           <div className="text-2xl font-bold font-mono tabular-nums">
-            {index.price.toLocaleString(undefined, {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}
+            {index.price > 0
+              ? index.price.toLocaleString(undefined, {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })
+              : "—"}
           </div>
           <div className="flex items-center gap-2 mt-1">
-            <MarketChangeColor value={index.change} />
-            <MarketChangePctColor value={index.change_pct} />
+            {index.price > 0 ? (
+              <>
+                <MarketChangeColor value={index.change} />
+                <MarketChangePctColor value={index.change_pct} />
+              </>
+            ) : (
+              <span className="text-xs text-muted-foreground">{t("overview.dataUnavailable")}</span>
+            )}
           </div>
         </div>
 
